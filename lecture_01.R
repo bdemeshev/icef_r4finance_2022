@@ -114,3 +114,139 @@ full
 # stats.stackexchange.com: questions about algorithms, models
 # stackoverflow.com: programming
 # rdrr.io
+
+
+# import - export
+getwd()
+
+setwd("/home/boris/Downloads")
+
+export(full, 'full.csv') # simplest one
+export(full, 'full.dta') # for stata
+export(full, 'full.sav') # spss
+export(full, 'full.xlsx') # excel
+
+full2 = import('full.csv')
+full
+full2
+
+glimpse(full)
+glimpse(full2)
+
+# some plots
+?import
+d = diamonds
+d
+
+# two common plots: histograms and scatter plots
+
+# grammar of graphics
+# link variables and aesthetics of the plot
+
+p = ggplot(data = d, aes(x = carat, y = price)) +
+  geom_point()
+
+
+p
+
+p + labs(title = 'Price of diamonds')
+
+p + labs(title = 'Price of diamonds',
+         x = 'Weight of a diamond (carats)')
+
+p + labs(title = 'Price of diamonds',
+         x = 'Weight of a diamond (carats)',
+         y = 'Price of a diamond (dollars)')
+
+p + labs(title = 'Price of diamonds',
+         x = 'Weight of a diamond (carats)',
+         y = 'Price of a diamond (dollars)',
+         subtitle = 'source: R dataset diamonds')
+
+
+p2 = ggplot(data = d, aes(x = carat, y = price / 1000)) +
+  geom_point()
+
+p2 + labs(title = 'Price of diamonds',
+         x = 'Weight of a diamond (carats)',
+         y = 'Price of a diamond (thousands of dollars)',
+         subtitle = 'source: R dataset diamonds')
+
+p2 + labs(title = 'Price of diamonds',
+          x = 'Weight of a diamond (carats)',
+          y = 'Price of a diamond (thousands of dollars)',
+          subtitle = 'source: R dataset diamonds') +
+      theme_light()
+
+
+p3 = ggplot(data = d, aes(x = carat, y = price)) +
+  geom_hex()
+
+p3 + labs(title = 'Price of diamonds',
+          x = 'Weight of a diamond (carats)',
+          y = 'Price of a diamond (thousands of dollars)',
+          subtitle = 'source: R dataset diamonds') +
+  theme_light()
+
+
+set.seed(777) # initial condition of random number generator
+d_sample = sample_n(diamonds, 500)
+
+p4 = ggplot(data = d_sample, aes(x = carat, y = price / 1000)) +
+  geom_point()
+
+best = p4 + labs(title = 'Price of diamonds',
+          x = 'Weight of a diamond (carats)',
+          y = 'Price of a diamond (thousands of dollars)',
+          subtitle = 'source: R dataset diamonds, subset of 500 out of 53000 obs') +
+  theme_light()
+best
+
+
+p5 = ggplot(data = d, aes(x = log(carat),
+                          y = log(price))) +
+  geom_hex()
+
+p5 + labs(title = 'Price of diamonds',
+          x = 'Log weight of a diamond (carats)',
+          y = 'Log price of a diamond (dollars)',
+          subtitle = 'source: R dataset diamonds') +
+  theme_light()
+
+library(patchwork) # organize many plots one near another
+(p + p2) / p3
+ggsave('plot.png', dpi = 300)
+
+
+ggplot(data = diamonds, aes(x = carat)) +
+  geom_histogram()
+
+# regression model
+
+library(estimatr) # lm_robust()
+
+# non robust standard errors
+model_a = lm(data = diamonds,
+        log(price) ~ log(carat) + x + y + z)
+summary(model_a)
+# hat log(price) = 8.04 + 1.56 log(carat) + 0.069 x + 0.024 y - 0.049 z
+
+
+# robust standard errors
+model_b = lm_robust(data = diamonds,
+             log(price) ~ log(carat) + x + y + z)
+summary(model_b)
+# hat log(price) = 8.04 + 1.56 log(carat) + 0.069 x + 0.024 y - 0.049 z
+
+# two parts of the course
+# mine: 4 lectures
+
+# grading: my part: datacamp.com
+# two short courses there (one course ~ 4-5 hours of work)
+# I recommend two courses, but you are free to change them
+
+# Dean Fantazzini
+
+
+
+
