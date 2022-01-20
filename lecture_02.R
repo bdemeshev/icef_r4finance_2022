@@ -171,3 +171,46 @@ m4 = pivot_longer(m3, cols = `2006`:`2021`, names_to = 'year', values_to = 'tota
 # 2006 + 2015 vs `2006` + `2015`
 glimpse(m4)
 m4
+
+unique(m4$period)
+m5 = filter(m4, !str_detect(period, '-')) # no '-' in the column 'period'
+m5
+unique(m5$period)
+
+dictionary = tibble(period = unique(m5$period), month_no = 1:12)
+dictionary
+
+m6 = left_join(m5, dictionary, by = 'period')
+m6
+
+m7 = select(m6, -period)
+m7
+
+?separate
+
+m8 = separate(m7, col = 'region',
+              into = c('code', 'name'),
+              sep = ' ',
+              extra = 'merge')
+m8
+
+m9 = mutate(m8,
+    date = yearmonth(paste0(year, '-', month_no)))
+m9
+
+m10 = select(m9, -year, -month_no)
+m10
+
+m11 = mutate(m10, code = as.numeric(code))
+
+# total: actual time series
+# date: index
+# code, name: key
+
+marr = as_tsibble(m11,
+          index = date, key = c('code', 'name'))
+marr
+
+rf = filter(marr, code == 643)
+gg_tsdisplay(rf, total)
+
