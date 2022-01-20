@@ -144,3 +144,10 @@ more_mods = mutate(mod_y, new = (arma11 + auto) / 2)
 fcst = forecast(more_mods, h = '2 years') # h = 24
 
 accuracy(fcst, d)
+
+# marriages in Russia
+#
+
+m = import('https://github.com/bdemeshev/om_ts/raw/main/data/marriages_original.xls')
+
+
