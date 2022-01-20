@@ -114,12 +114,33 @@ nrow(train)
 # ARMA(1,1) = SARIMA(1, 0, 1)-(0, 0, 0)[12]
 # automatic one
 
-mod_y = model(d,
+mod_y = model(train,
       arma11 = ARIMA(y ~ 1 + pdq(1, 0, 1) + PDQ(0, 0, 0)),
       auto = ARIMA(y))
 mod_y
 report(mod_y$arma11[[1]])
-# (1 - (-0.3424)L) (y_t - (-0.0137)) = (1 + 0.1780L) u_t
+# (1 - (-0.3919)L) (y_t - (0.2120)) = (1 + 0.0150L) u_t
 
 report(mod_y$auto[[1]])
+?ARIMA
 
+glance(mod_y)
+
+fcst = forecast(mod_y, h = '2 years') # h = 24
+fcst
+
+autoplot(fcst)
+
+autoplot(fcst, d)
+
+accuracy(fcst, d)
+
+# how combine models?
+# Strategy 1: decompose time series into components
+# use different models for components
+# Strategy 2: average forecasts from some models
+
+more_mods = mutate(mod_y, new = (arma11 + auto) / 2)
+fcst = forecast(more_mods, h = '2 years') # h = 24
+
+accuracy(fcst, d)
