@@ -264,5 +264,28 @@ fcst = forecast(more_mods, h = '3 years')
 accuracy(fcst, rf) %>% arrange(MAE)
 # 3 years - long horizon
 
+# cross validation for short term (1 month ahead) forecasts
+
+fcst = forecast(models, h = '1 month')
+fcst
+
+nrow(train)
+sliding_train = slide_tsibble(rf, .size = 153, .step = 1)
+filter(sliding_train, .id == 20)
 
 
+models = model(sliding_train,
+               snaive = SNAIVE(total),
+               auto_ln = ARIMA(log(total)),
+               theta = THETA(total) # a strong player for monthly ts
+)
+# 3 years = 36 months
+# 36 training samples
+# 36 training sample x (approx) 100 ARIMA models ~ 3600 models
+glance(models)
+
+fcst = forecast(models, h = '1 month')
+accuracy(fcst, rf)
+accuracy(fcst, rf) %>% arrange(MAE)
+
+# Forecasting principles and practice, Hyndman
