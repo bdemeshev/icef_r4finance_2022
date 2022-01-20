@@ -264,3 +264,5 @@ fcst = forecast(more_mods, h = '3 years')
 accuracy(fcst, rf) %>% arrange(MAE)
 # 3 years - long horizon
 
+
+
