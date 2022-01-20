@@ -145,6 +145,8 @@ fcst = forecast(more_mods, h = '2 years') # h = 24
 
 accuracy(fcst, d)
 
+# break
+
 # marriages in Russia
 #
 
@@ -203,14 +205,62 @@ m10
 
 m11 = mutate(m10, code = as.numeric(code))
 
+# omit missing observations
+m12 = na.omit(m11) # na = not available observations
+
 # total: actual time series
 # date: index
 # code, name: key
 
-marr = as_tsibble(m11,
+marr = as_tsibble(m12,
           index = date, key = c('code', 'name'))
 marr
 
 rf = filter(marr, code == 643)
 gg_tsdisplay(rf, total)
+
+
+# compare some models using train-test split, CV
+tail(rf)
+
+train = filter(rf, date < ymd('2018-10-01'))
+tail(train)
+
+models = model(train,
+      snaive = SNAIVE(total),
+      auto = ARIMA(total),
+      auto_ln = ARIMA(log(total)),
+      sarima111_111 = ARIMA(total ~ 0 + pdq(1, 1, 1) + PDQ(1, 1, 1)),
+      theta_ln = THETA(log(total)),
+      theta = THETA(total) # a strong player for monthly ts
+      )
+glance(models)
+
+report(models$auto[[1]])
+# (4,1,1): 4 coefs in AR, 1 nonseas difference, 1 coef in MA
+# (0,1,1): 0 coefs in SAR, 1 seas difference, 1 coef in SMA
+# equation:
+# (1-(-0.0753)L-0.1091L^2-0.2707L^3-(-0.2134)L^4)(1-L)(1-L^12)y_t =
+# = (1 + (-0.8800)L)(1 + (-0.8360)L^12) u_t
+
+fcst = forecast(models, h = '3 years')
+fcst
+
+
+filter(fcst, .model == 'auto_ln')
+
+
+autoplot(filter(fcst, .model == 'auto'),
+         filter(rf, date > ymd('2015-01-01')))
+
+autoplot(fcst, rf) # too much to plot :)
+
+# MASE = mean absolute scaled error
+# MAE = mean absolute error
+accuracy(fcst, rf) %>% arrange(MAE)
+
+more_mods = mutate(models, top3 = (auto_ln + theta + auto) / 3)
+fcst = forecast(more_mods, h = '3 years')
+accuracy(fcst, rf) %>% arrange(MAE)
+# 3 years - long horizon
 
