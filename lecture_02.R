@@ -148,6 +148,26 @@ accuracy(fcst, d)
 # marriages in Russia
 #
 
-m = import('https://github.com/bdemeshev/om_ts/raw/main/data/marriages_original.xls')
+url = 'https://github.com/bdemeshev/om_ts/raw/main/data/marriages_original.xls'
+m = import(url)
 
+m2 = import(url, skip = 2)
+m2
 
+colnames(m2)
+colnames(m2)[1:3] = c('region', 'unit', 'period')
+
+glimpse(m2)
+
+unique(m2$unit) # the same value for all observations :)
+m3 = select(m2, -unit)
+
+glimpse(m3)
+# melt
+# icicle
+# pivot_longer | pivot_wider
+
+m4 = pivot_longer(m3, cols = `2006`:`2021`, names_to = 'year', values_to = 'total')
+# 2006 + 2015 vs `2006` + `2015`
+glimpse(m4)
+m4
