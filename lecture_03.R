@@ -38,5 +38,45 @@ report(mods$auto_ets[[1]])
 mam_fcsts = filter(fcsts, .model == 'auto_ets')
 autoplot(mam_fcsts, aus_train)
 
+aaa_cmpnts = components(mods$ets_aaa[[1]])
+aaa_cmpnts
+autoplot(aaa_cmpnts)
+
+# decomposition model
+# which model is used to decompose ts?
+# which model is used for every component of ts?
+
+# decompose by ETS(MAM)
+# ARMA(1, 1) for remainder
+# SNAIVE for seasonal
+# ETS(MAN) for trend
+
+dec_formula = Electricity ~ error('M') + trend('A') + season('M')
+dec_formula
+components(mods$auto_ets[[1]])
+
+# for simplicity I will use STL decomposition
+
+mods2 = model(aus_train,
+      snaive = SNAIVE(Electricity),
+      dec_model = decomposition_model(
+        STL(Electricity ~ season(window = 10)),
+        ETS(season_adjust ~ error('M') + trend('A') + season('N')),
+        SNAIVE(season_year)
+        ))
+
+mods2
+report(mods2$dec_model[[1]])
+
+fcst2 = forecast(mods2, h = '4 years')
+accuracy(fcsts, aus_production) %>% arrange(MASE)
+
+accuracy(fcst2, aus_production)
+
+
+?decomposition_model
+
+
+
 
 
