@@ -46,14 +46,11 @@ autoplot(aaa_cmpnts)
 # which model is used to decompose ts?
 # which model is used for every component of ts?
 
-# decompose by ETS(MAM)
-# ARMA(1, 1) for remainder
+# decompose by STL
+# nothing for remainder
 # SNAIVE for seasonal
 # ETS(MAN) for trend
 
-dec_formula = Electricity ~ error('M') + trend('A') + season('M')
-dec_formula
-components(mods$auto_ets[[1]])
 
 # for simplicity I will use STL decomposition
 
