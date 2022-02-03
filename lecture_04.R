@@ -60,8 +60,16 @@ fviz_pca_ind(comps)
 
 fviz_pca_ind(comps, repel = TRUE)
 
+# the main plot
 fviz_pca_biplot(comps, repel = TRUE)
 
+# weights of every original variable in principal components
 comps$rotation
 
 fviz_eig(comps, addlabels = TRUE)
+fviz_contrib(comps, axes = 1, choice = 'var')
+
+fviz_contrib(comps, axes = 1, choice = 'ind')
+
+
+
