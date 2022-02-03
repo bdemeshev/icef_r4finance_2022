@@ -1,0 +1,78 @@
+---
+title: "r + markdown demo"
+author: "Winnie the Pooh"
+date: "2/3/2022"
+output: 
+  html_document: 
+    keep_md: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = TRUE)
+```
+
+# Our brave research!
+
+Let's attach packages :)
+```{r library block}
+library(tidyverse) # data manipulation
+library(rio) # data import/export
+library(cluster) # :)
+library(factoextra) # visualizations for pca, cluster...
+library(corrplot) # visualize correlations
+```
+
+We will work with heptathlon dataset.
+```{r, echo=TRUE}
+h = HSAUR::heptathlon
+```
+
+We have `r nrow(h)` observations in the dataset. 
+
+Let's look at the correlation matrix!
+```{r corrplot}
+cor_mat = cor(h)
+corrplot(cor_mat, order = 'hclust', addrect = 3)
+```
+
+Let's add principal component analysis!
+```{r pca}
+h7 = select(h, -score)
+comps = prcomp(h7, scale. = TRUE)
+fviz_pca_biplot(comps, repel = TRUE)
+```
+
+Launa is far away :)
+
+Let's create three clusters usign k-means!
+```{r cluster}
+set.seed(777) # we are lucky!
+h7scaled = mutate(h7, across(hurdles:run800m,
+                             ~ (.x - mean(.x)) / sd(.x)))
+h7_kmeans = kmeans(h7scaled, centers = 3)
+
+h7_augmented = mutate(h7, cluster = h7_kmeans$cluster)
+
+fviz_cluster(h7_kmeans, data = h7scaled)
+```
+
+
+```{r distances}
+h7dist = dist(h7scaled, method = 'euclidean')
+fviz_dist(h7dist)
+```
+
+
+```{r dendrogram}
+h7hier = hcut(h7dist, k = 4)
+h7_augmented2 = mutate(h7, cluster = h7hier$cluster)
+fviz_dend(h7hier)
+```
+
+
+
+
+
+

@@ -71,7 +71,6 @@ fviz_contrib(comps, axes = 1, choice = 'var')
 
 fviz_contrib(comps, axes = 1, choice = 'ind')
 
-# let's start from the end :)
 # k-means clustering: *creating* a new variable
 
 # we standardize original variables (!)
@@ -117,3 +116,12 @@ fviz_dist(h7dist)
 # classification / regression
 
 h7hier = hcut(h7dist, k = 4)
+h7hier
+
+h7hier$cluster
+
+h7_augmented2 = mutate(h7, cluster = h7hier$cluster)
+h7_augmented2
+
+
+fviz_dend(h7hier)
