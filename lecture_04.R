@@ -26,7 +26,7 @@ corrplot(cor_mat, order = 'hclust', addrect = 3)
 str(h)
 
 h7 = select(h, -score)
-h7
+glimpse(h7)
 
 # principal component analysis?
 
@@ -71,5 +71,49 @@ fviz_contrib(comps, axes = 1, choice = 'var')
 
 fviz_contrib(comps, axes = 1, choice = 'ind')
 
+# let's start from the end :)
+# k-means clustering: *creating* a new variable
+
+# we standardize original variables (!)
+# 1. we assign labels of clusters randomly
+# 2. we calculate centers of clusters
+# 3. we reassign labels by choosing cluster with closes center
+# for each observation
+# go to step 2.
+
+?kmeans
+
+h7scaled = mutate(h7, across(hurdles:run800m,
+                             ~ (.x - mean(.x)) / sd(.x)))
+h7scaled
+
+h7_kmeans = kmeans(h7scaled, centers = 3)
+
+h7_kmeans
+
+h7_kmeans$cluster
+
+h7_augmented = mutate(h7, cluster = h7_kmeans$cluster)
+h7_augmented
+
+fviz_cluster(h7_kmeans, data = h7scaled)
 
 
+fviz_nbclust(h7scaled, kmeans, method = 'wss')
+
+# hierarchical clustering
+
+# 1. calculate distances between observations
+# 2. we collapse two closest observations into one cluster
+# (one new point with average coordinates)
+# go to step 2
+
+h7dist = dist(h7scaled, method = 'euclidean')
+h7dist
+
+fviz_dist(h7dist)
+
+# k nearest neighbors: predict existing variable y
+# classification / regression
+
+h7hier = hcut(h7dist, k = 4)
